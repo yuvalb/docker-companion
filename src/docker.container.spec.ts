@@ -29,7 +29,7 @@ describe("docker container", () => {
     describe("volumes", () => {
       let volumeContainer: RunnableContainer;
 
-      const TempDir = resolve(process.cwd(), "test", "temp");
+      const TempDir = resolve(process.cwd(), "temp");
       const HostDir = "/usr/local/tmp";
       const HostDir2 = `${HostDir}2`;
 
@@ -54,11 +54,7 @@ describe("docker container", () => {
 
         const { out, err } = await container.execute(cmd);
         console.log(out);
-        assert.equal(
-          !!err,
-          false,
-          `failed writing to volume with error: ${err}`
-        );
+        assert.equal(!!err, false, `failed writing to volume with error: ${err}`);
 
         const localFilepath = resolve(TempDir, filename);
         const fileExists = existsSync(localFilepath);
@@ -154,9 +150,16 @@ describe("docker container", () => {
     });
 
     it("can exec command", async () => {
-      const execResult = await container.execute(["echo", "bla"]);
-      assert.equal(execResult.err, "");
-      assert.equal(execResult.out, "bla\n");
+      const { out, err } = await container.execute(["echo", "bla"]);
+      assert.equal(err, "");
+      assert.equal(out, "bla\n");
+    });
+
+    it("reports stderr", async () => {
+      const { out, err } = await container.execute(["ls", "nothing"]);
+
+      assert.equal(!!err, true, "stderr was not read");
+      assert.equal(!!out, false, "stdout was not empty");
     });
   });
 
