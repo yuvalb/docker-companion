@@ -9,6 +9,8 @@
   "scripts": {
     "build": "tsc -p .",
     "test": "mocha --require ts-node/register --timeout 30000 './**/*.spec.ts'",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json",
     "prepublish": "tsc"
   },
   "repository": {
@@ -16,8 +18,10 @@
     "url": "git+https://github.com/yuvalb/docker-companion.git"
   },
   "keywords": [
-    "flow",
-    "procedure"
+    "docker",
+    "container",
+    "docker-container",
+    "companion"
   ],
   "author": "yuvalb",
   "license": "MIT",
@@ -29,7 +33,10 @@
     "@types/mocha": "^9.0.0",
     "@types/node": "^16.4.13",
     "mocha": "^8.3.2",
+    "prettier": "^2.3.2",
     "ts-node": "^10.1.0",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.5"
   }
 }
