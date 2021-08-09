@@ -2,7 +2,7 @@ import * as assert from "assert";
 import { randomBytes } from "crypto";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { resolve } from "path";
-import { build, RunnableContainer } from "./docker.container";
+import { build, DockerContainer } from "./docker.container";
 import { normalizeVoid } from "./docker.spec";
 
 describe("docker container", () => {
@@ -12,7 +12,7 @@ describe("docker container", () => {
   };
 
   describe("start", () => {
-    let container: RunnableContainer;
+    let container: DockerContainer;
 
     before(async () => {
       container = await build(args).start();
@@ -27,7 +27,7 @@ describe("docker container", () => {
     });
 
     describe("volumes", () => {
-      let volumeContainer: RunnableContainer;
+      let volumeContainer: DockerContainer;
 
       const TempDir = resolve(process.cwd(), "temp");
       const HostDir = "/usr/local/tmp";
@@ -46,7 +46,7 @@ describe("docker container", () => {
         rmSync(TempDir, { recursive: true });
       });
 
-      async function testWrite(container: RunnableContainer, hostDir: string) {
+      async function testWrite(container: DockerContainer, hostDir: string) {
         const filename = `${randomBytes(4).toString("hex")}.txt`;
         const hostFilepath = `${hostDir}/${filename}`;
         const data = `${randomBytes(4).toString("hex")}`;
@@ -54,7 +54,11 @@ describe("docker container", () => {
 
         const { out, err } = await container.execute(cmd);
         console.log(out);
-        assert.equal(!!err, false, `failed writing to volume with error: ${err}`);
+        assert.equal(
+          !!err,
+          false,
+          `failed writing to volume with error: ${err}`
+        );
 
         const localFilepath = resolve(TempDir, filename);
         const fileExists = existsSync(localFilepath);
@@ -63,7 +67,7 @@ describe("docker container", () => {
         assert.equal(fileData, data, "file content doesn't match input");
       }
 
-      async function testRead(container: RunnableContainer, hostDir: string) {
+      async function testRead(container: DockerContainer, hostDir: string) {
         const filename = `${randomBytes(4).toString("hex")}.txt`;
         const filepath = resolve(TempDir, filename);
         const data = `${randomBytes(4).toString("hex")}`;
@@ -90,7 +94,7 @@ describe("docker container", () => {
         testRead(volumeContainer, HostDir));
 
       describe("multiple", () => {
-        let multipleVolumeContainer: RunnableContainer;
+        let multipleVolumeContainer: DockerContainer;
 
         before(async () => {
           mkdirSync(TempDir, { recursive: true });
@@ -139,7 +143,7 @@ describe("docker container", () => {
   });
 
   describe("exec", () => {
-    let container: RunnableContainer;
+    let container: DockerContainer;
 
     before(async () => {
       container = await build(args).start();
@@ -164,7 +168,7 @@ describe("docker container", () => {
   });
 
   describe("stop", () => {
-    let container: RunnableContainer;
+    let container: DockerContainer;
 
     before(async () => {
       container = await build(args).start();

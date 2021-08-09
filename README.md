@@ -4,10 +4,12 @@
 
 # Prerequisites
 
-#### You must have the following installed to run `docker-companion`:
+You must have the following installed to run `docker-companion`:
 
 - node 16 or higher
 - docker
+
+Additionally, typescript users can utilise the built-in typings.
 
 #### Install
 
