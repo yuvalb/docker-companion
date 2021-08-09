@@ -7,7 +7,8 @@ export type ExecutionResult = {
 };
 
 export async function verifyExistsImage(image: string): Promise<boolean> {
-  const shouldPull = !(await existsImage(image));
+  const imageExists = await existsImage(image);
+  const shouldPull = !imageExists;
 
   if (shouldPull) {
     await pullImage(image);
@@ -17,47 +18,55 @@ export async function verifyExistsImage(image: string): Promise<boolean> {
 }
 
 export async function existsImage(image: string): Promise<boolean> {
-  const args = ["image", "inspect", image];
-
-  const { out, err } = await executeDocker(args);
+  const { out, err } = await executeDocker("image", "inspect", image);
 
   return !err && !!out;
 }
 
 export async function pullImage(image: string): Promise<void> {
-  const args = ["pull", image];
-  const { err } = await executeDocker(args);
+  const { err } = await executeDocker("pull", image);
 
   if (err) {
-    throw new Error(`Could not pull docker image '${image}' due to error: ${err}`);
+    throw new Error(
+      `Could not pull docker image '${image}' due to error: ${err}`
+    );
   }
-  return;
 }
 
 export async function removeImage(image: string): Promise<void> {
-  const args = ["image", "rm", image];
-  const { err } = await executeDocker(args);
+  const { err } = await executeDocker("image", "rm", image);
 
   if (err) {
-    throw new Error(`Could not remove docker image '${image}' due to error: ${err}`);
+    throw new Error(
+      `Could not remove docker image '${image}' due to error: ${err}`
+    );
   }
-  return;
 }
 
-export async function executeDocker(args: string[]): Promise<ExecutionResult> {
+export async function executeDocker(
+  ...args: string[]
+): Promise<ExecutionResult> {
   const { stdout, stderr } = spawn("docker", args);
 
-  const out$ = readableToString(stdout);
-  const err$ = readableToString(stderr);
-
+  const [out$, err$] = [stdout, stderr].map(readableToString);
   const [out, err] = await Promise.all([out$, err$]);
+
+  const containerNotRunning = err.match(
+    /^Error response from daemon: Container (?<containerId>[\w]+) is not running*/
+  );
+
+  if (containerNotRunning) {
+    const id = containerNotRunning?.groups?.containerId;
+    throw new Error(`Could not execute in container ${id} with error: ${err}`);
+  }
+
   return { out, err };
 }
 
-export async function readableToString(readable: Readable): Promise<string> {
+async function readableToString(readable: Readable): Promise<string> {
   const chunks = [];
 
-  for await (let chunk of readable) {
+  for await (const chunk of readable) {
     chunks.push(chunk);
   }
 
