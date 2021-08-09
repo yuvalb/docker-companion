@@ -23,7 +23,10 @@
     "docker-container",
     "companion"
   ],
-  "author": "yuvalb",
+  "contributors": [
+    "yuvalb",
+    "ron-aharoni"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/yuvalb/docker-companion/issues"

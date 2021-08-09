@@ -58,7 +58,11 @@ console.log(err); // "ls: nothing: No such file or directory"
 ### Write to shared volume
 
 ```ts
-await container.execute(["sh", "-c", `echo -e -n hello > /usr/local/tmp/hello.txt`]);
+await container.execute([
+  "sh",
+  "-c",
+  `echo -e -n hello > /usr/local/tmp/hello.txt`,
+]);
 
 const localFile = resolve(TempDir, "hello.txt");
 const content = readFileSync(localFile);
@@ -72,7 +76,7 @@ console.log(content); // "hello"
 await container.stop();
 ```
 
-# Authors
+# Contributors
 
 - [ron-aharoni](https://github.com/ron-aharoni) 🦆
 - [yuvalb](https://github.com/yuvalb) 🦜
