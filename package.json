@@ -1,6 +1,6 @@
 {
   "name": "docker-companion",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A package for managing lifecycle and execution of docker containers.",
   "main": "dist/index.js",
   "files": [
